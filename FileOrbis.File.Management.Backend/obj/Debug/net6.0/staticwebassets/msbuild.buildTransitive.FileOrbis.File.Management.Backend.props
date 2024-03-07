@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\FileOrbis.File.Management.Backend.props" />
+</Project>
