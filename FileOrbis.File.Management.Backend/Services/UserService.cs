@@ -30,30 +30,6 @@ namespace FileOrbis.File.Management.Backend.Services
             return new UserResponse(userRepository.GetById(id));
         }
 
-        public FolderResponse AddNewFolder(FolderRequest folder, int userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public FileResponse AddFile(FileRequest file, int userId)
-        {
-            string path = Path.Combine("C:\\file_management_system\\", file.Email, file.Path);
-            file.Content.CopyTo(new FileStream(path, FileMode.Create));
-
-            Models.File newFile = new Models.File()
-            {
-                Name = file.Content.FileName,
-                Type = file.Content.ContentType,
-                CreatedDate = DateTime.Now,
-                Size = file.Content.Length,
-                Path = path,
-                FolderId = file.FolderId,
-                UserId = userId
-            };
-
-            return new FileResponse(userRepository.AddFile(newFile));
-        }
-
     }
 
 }

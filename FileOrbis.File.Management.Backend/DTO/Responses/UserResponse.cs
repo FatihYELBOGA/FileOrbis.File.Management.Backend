@@ -10,6 +10,8 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
         public string Email { get; set; }
         public FolderResponse Folders { get; set; }
 
+        public UserResponse() { }
+
         public UserResponse(User user) 
         {
             Id = user.Id;

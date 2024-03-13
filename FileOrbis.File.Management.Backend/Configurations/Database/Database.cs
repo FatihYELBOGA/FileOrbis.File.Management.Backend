@@ -14,14 +14,10 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Models.File> Files { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Folder>()
-                .HasOne(f => f.User)
-                .WithMany(u => u.Folders)
-                .HasForeignKey(f => f.UserId)
-                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Folder>()
                 .HasOne(f => f.ParentFolder)
@@ -35,17 +31,17 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 .HasForeignKey(f => f.FolderId)
                 .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Models.File>()
-                .HasOne(f => f.User)
-                .WithMany(u => u.Files)
-                .HasForeignKey(f => f.UserId)
-                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
-
             modelBuilder.Entity<User>()
                 .HasOne(u => u.RootFolder)
                 .WithOne(f => f.RootFolderUser)
                 .HasForeignKey<User>(u => u.RootFolderId)
                 .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithOne(u => u.RefreshToken)
+                .HasForeignKey<RefreshToken>(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         private static User[] users =

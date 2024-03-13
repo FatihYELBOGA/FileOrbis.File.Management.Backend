@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Fatih YELBOĞA\\source\\repos\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj": {}
+    "C:\\Users\\Fatih YELBOĞA\\Documents\\GitHub\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Fatih YELBOĞA\\source\\repos\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj": {
+    "C:\\Users\\Fatih YELBOĞA\\Documents\\GitHub\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Fatih YELBOĞA\\source\\repos\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj",
+        "projectUniqueName": "C:\\Users\\Fatih YELBOĞA\\Documents\\GitHub\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj",
         "projectName": "FileOrbis.File.Management.Backend",
-        "projectPath": "C:\\Users\\Fatih YELBOĞA\\source\\repos\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj",
+        "projectPath": "C:\\Users\\Fatih YELBOĞA\\Documents\\GitHub\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend.csproj",
         "packagesPath": "C:\\Users\\Fatih YELBOĞA\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Fatih YELBOĞA\\source\\repos\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\obj\\",
+        "outputPath": "C:\\Users\\Fatih YELBOĞA\\Documents\\GitHub\\FileOrbis.File.Management.Backend\\FileOrbis.File.Management.Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Fatih YELBOĞA\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,6 +40,10 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[7.0.16, )"
@@ -57,6 +61,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "Swashbuckle.AspNetCore.Filters": {
+              "target": "Package",
+              "version": "[8.0.1, )"
             }
           },
           "imports": [

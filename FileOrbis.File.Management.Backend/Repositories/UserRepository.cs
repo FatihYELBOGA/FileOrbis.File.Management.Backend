@@ -27,23 +27,7 @@ namespace FileOrbis.File.Management.Backend.Repositories
                     .ThenInclude(f => f.SubFolders)
                 .Include(u => u.RootFolder)
                     .ThenInclude(f => f.SubFiles)
-                .First();
-        }
-
-        public Folder AddNewFolder(Folder folder)
-        {
-            Folder newFolder = database.Folders.Add(folder).Entity;
-            database.SaveChanges();
-            
-            return newFolder;
-        }
-
-        public Models.File AddFile(Models.File file)
-        {
-            Models.File newFile = database.Files.Add(file).Entity;
-            database.SaveChanges();
-
-            return newFile;
+                .FirstOrDefault();
         }
 
     }

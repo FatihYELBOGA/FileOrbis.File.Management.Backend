@@ -51,14 +51,9 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("FolderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Files");
                 });
@@ -81,16 +76,41 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Property<int?>("ParentFolderId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentFolderId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Folders");
+                });
+
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.User", b =>
@@ -117,6 +137,9 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<int?>("RootFolderId")
                         .HasColumnType("int");
 
@@ -136,14 +159,7 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         .HasForeignKey("FolderId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("FileOrbis.File.Management.Backend.Models.User", "User")
-                        .WithMany("Files")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Folder");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.Folder", b =>
@@ -153,12 +169,16 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         .HasForeignKey("ParentFolderId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("FileOrbis.File.Management.Backend.Models.User", "User")
-                        .WithMany("Folders")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("ParentFolder");
+                });
+
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.RefreshToken", b =>
+                {
+                    b.HasOne("FileOrbis.File.Management.Backend.Models.User", "User")
+                        .WithOne("RefreshToken")
+                        .HasForeignKey("FileOrbis.File.Management.Backend.Models.RefreshToken", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -184,9 +204,7 @@ namespace FileOrbis.File.Management.Backend.Migrations
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.User", b =>
                 {
-                    b.Navigation("Files");
-
-                    b.Navigation("Folders");
+                    b.Navigation("RefreshToken");
                 });
 #pragma warning restore 612, 618
         }

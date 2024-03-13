@@ -35,7 +35,7 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
                     subfile.Folder = null;
                     SubFiles.Add(new FileResponse(subfile));
                 }
-            }
+            } 
 
         }
 

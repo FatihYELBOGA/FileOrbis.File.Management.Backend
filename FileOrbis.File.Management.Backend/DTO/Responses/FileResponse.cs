@@ -8,7 +8,6 @@
         public DateTime CreatedDate { get; set; }
         public float Size { get; set; }
         public string Path { get; set; }
-        public string FolderName { get; set; }
 
         public FileResponse(Models.File file) 
         {
@@ -18,12 +17,6 @@
             CreatedDate = file.CreatedDate;
             Size = file.Size;
             Path = file.Path;
-            
-            if(file.Folder != null)
-            {
-                FolderName = file.Folder.Name;
-            }
-
         }
 
     }
