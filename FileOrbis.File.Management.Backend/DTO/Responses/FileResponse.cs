@@ -6,8 +6,9 @@
         public string Name { get; set; }
         public string Type { get; set; }
         public DateTime CreatedDate { get; set; }
-        public float Size { get; set; }
         public string Path { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+        public string Size { get; set; }
 
         public FileResponse(Models.File file) 
         {
@@ -15,7 +16,6 @@
             Name = file.Name;
             Type = file.Type;
             CreatedDate = file.CreatedDate;
-            Size = file.Size;
             Path = file.Path;
         }
 

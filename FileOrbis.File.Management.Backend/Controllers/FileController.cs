@@ -22,12 +22,6 @@ namespace FileOrbis.File.Management.Backend.Controllers
             return fileService.GetById(id);
         }
 
-        [HttpPost("/files/create")]
-        public FileResponse CreateFile([FromForm] CreateFileRequest createFileRequest)
-        {
-            return fileService.Create(createFileRequest);
-        }
-
         [HttpPost("/files/add")]
         public FileResponse Add([FromForm] AddFileRequest addFileRequest)
         {

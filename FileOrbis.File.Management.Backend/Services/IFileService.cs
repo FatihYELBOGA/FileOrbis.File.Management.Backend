@@ -7,7 +7,6 @@ namespace FileOrbis.File.Management.Backend.Services
     public interface IFileService
     {
         public IActionResult GetById(int id);
-        public FileResponse Create(CreateFileRequest createFileRequest);
         public FileResponse Add(AddFileRequest addFileRequests);
         public bool DeleteById(int id);
 

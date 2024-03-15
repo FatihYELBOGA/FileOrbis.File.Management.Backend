@@ -18,7 +18,38 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public FolderResponse GetById(int id)
         {
-            return new FolderResponse(folderRepository.GetById(id));
+            Folder foundFolder = folderRepository.GetById(id);
+            FolderResponse folderResponse = new FolderResponse(foundFolder);
+            string folderPath = Path.Combine(configuration.GetSection("MainFolderPath").Value, foundFolder.Path);
+            folderResponse.LastModifiedDate = Directory.GetLastWriteTime(folderPath);
+
+            foreach (var file in folderResponse.SubFiles)
+            {
+                string filePath = file.Path;
+                FileInfo fileInfo = new FileInfo(filePath);
+                file.LastModifiedDate = fileInfo.LastWriteTime; 
+                double kb = (double)fileInfo.Length / 1024;
+                file.Size = kb.ToString("0") + " KB";
+                double mb;
+                if (kb >= 1024)
+                {
+                    mb = (double)kb / 1024;
+                    file.Size = mb.ToString("0.00") + " MB";
+                }
+
+            }
+
+            return folderResponse;
+        }
+
+        public FolderResponse GetByPath(string path)
+        {
+            Folder foundFolder = folderRepository.GetByPath(path);
+            FolderResponse folderResponse = new FolderResponse(foundFolder);
+            string folderPath = Path.Combine(configuration.GetSection("MainFolderPath").Value, foundFolder.Path);
+            folderResponse.LastModifiedDate = Directory.GetLastWriteTime(folderPath);
+
+            return folderResponse;
         }
 
         public FolderResponse Create(CreateFolderRequest createFolderRequest)
@@ -26,11 +57,13 @@ namespace FileOrbis.File.Management.Backend.Services
             string path = Path.Combine(configuration.GetSection("MainFolderPath").Value, createFolderRequest.Path);
             Directory.CreateDirectory(path);
 
+            string[] folderName = createFolderRequest.Path.Split('/');
             Folder newFolder = new Folder()
             {
+                Name = folderName[folderName.Length-1],  
                 CreatedDate = DateTime.Now,
                 ParentFolderId = createFolderRequest.ParentFolderId,
-                Path = path
+                Path = createFolderRequest.Path
             };
 
             return new FolderResponse(folderRepository.Create(newFolder));

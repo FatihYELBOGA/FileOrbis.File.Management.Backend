@@ -7,6 +7,8 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
         public int Id { get; set; }
         public string Name { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
+        public string Path { get; set; }
         public List<FolderResponse> SubFolders { get; set; }
         public List<FileResponse> SubFiles { get; set; }
 
@@ -15,6 +17,7 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             Id = folder.Id;
             Name = folder.Name;
             CreatedDate = folder.CreatedDate;
+            Path = folder.Path;
             SubFolders = new List<FolderResponse>();
             SubFiles = new List<FileResponse>();
 

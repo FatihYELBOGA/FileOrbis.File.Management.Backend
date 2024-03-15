@@ -1,6 +1,4 @@
-﻿using FileOrbis.File.Management.Backend.DTO.Requests;
-using FileOrbis.File.Management.Backend.DTO.Responses;
-using FileOrbis.File.Management.Backend.Models;
+﻿using FileOrbis.File.Management.Backend.DTO.Responses;
 using FileOrbis.File.Management.Backend.Repositories;
 
 namespace FileOrbis.File.Management.Backend.Services

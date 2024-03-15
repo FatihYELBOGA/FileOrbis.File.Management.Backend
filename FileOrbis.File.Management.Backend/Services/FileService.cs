@@ -31,29 +31,6 @@ namespace FileOrbis.File.Management.Backend.Services
             return null;
         }
 
-        public FileResponse Create(CreateFileRequest createFileRequest)
-        {
-            string path = Path.Combine(configuration.GetSection("MainFolderPath").Value, createFileRequest.Path);
-
-            long length = 0;
-            using (FileStream fs = System.IO.File.Create(path))
-            {
-                length = fs.Length;
-                Console.WriteLine("file created succesfully!");
-            }
-
-            Models.File newFile = new Models.File()
-            {
-                Type = Path.GetExtension(path),
-                CreatedDate = DateTime.Now,
-                Size = length,
-                Path = path,
-                FolderId = createFileRequest.ParentFolderId
-            };
-
-            return new FileResponse(fileRepository.Create(newFile));
-        }
-
         public FileResponse Add(AddFileRequest addFileRequest)
         {
             string path = Path.Combine(configuration.GetSection("MainFolderPath").Value, addFileRequest.Path, addFileRequest.Content.FileName);
@@ -64,7 +41,6 @@ namespace FileOrbis.File.Management.Backend.Services
                 Name = addFileRequest.Content.FileName,
                 Type = addFileRequest.Content.ContentType,
                 CreatedDate = DateTime.Now,
-                Size = addFileRequest.Content.Length,
                 Path = path,
                 FolderId = addFileRequest.FolderId
             };

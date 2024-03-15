@@ -29,6 +29,13 @@ namespace FileOrbis.File.Management.Backend.Repositories
                 .FirstOrDefault();
         }
 
+        public Folder GetByPath(string path)
+        {
+            return database.Folders
+                .Where(f => f.Path == path)
+                .FirstOrDefault();
+        }
+
         public Folder Create(Folder newFolder)
         {
             Folder returnedFolder = database.Folders.Add(newFolder).Entity;

@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\FileOrbis.File.Management.Backend.props" />
-</Project>

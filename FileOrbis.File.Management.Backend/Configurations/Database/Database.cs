@@ -6,7 +6,8 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
 {
     public class Database : DbContext
     {
-        public Database(DbContextOptions options) : base(options)
+
+        public Database(DbContextOptions options, IConfiguration configuration) : base(options)
         {
 
         }
@@ -51,21 +52,45 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 FirstName = "Fatih",
                 LastName = "YELBOGA",
                 Email = "fatihyelbogaaa@gmail.com",
-                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("fatih123"))
+                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("fatih123")),
+                Role = Enumerations.Role.USER,
+                RootFolder = new Folder()
+                {
+                    Name = "fatihyelbogaaa@gmail.com",
+                    CreatedDate = DateTime.Now,
+                    ParentFolder = null,
+                    Path = "fatihyelbogaaa@gmail.com"
+                }
             },
             new User
             {
                 FirstName = "Osman",
                 LastName = "ALTUNAY",
                 Email = "osmanaltunay@gmail.com",
-                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("osman123"))
+                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("osman123")),
+                Role = Enumerations.Role.USER,
+                RootFolder = new Folder()
+                {
+                    Name = "osmanaltunay@gmail.com",
+                    CreatedDate = DateTime.Now,
+                    ParentFolder = null,
+                    Path = "osmanaltunay@gmail.com"
+                }
             },
             new User
             {
                 FirstName = "Berkay",
                 LastName = "BAYRAK",
                 Email = "berkaybayrak@gmail.com",
-                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("berkay123"))
+                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("berkay123")),
+                Role = Enumerations.Role.USER,
+                RootFolder = new Folder()
+                {
+                    Name = "berkaybayrak@gmail.com",
+                    CreatedDate = DateTime.Now,
+                    ParentFolder = null,
+                    Path = "berkaybayrak@gmail.com"
+                }
             }
         };
 
@@ -77,6 +102,11 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 {
                     database.Users.AddRange(users);
                     database.SaveChanges();
+                }
+
+                foreach (var user in users)
+                {
+                    Directory.CreateDirectory(user.RootFolder.Path);
                 }
             }
         }

@@ -22,6 +22,12 @@ namespace FileOrbis.File.Management.Backend.Controllers
             return folderService.GetById(id);
         }
 
+        [HttpGet("/folders/path")]
+        public FolderResponse GetByPath([FromQuery] string path)
+        {
+            return folderService.GetByPath(path);
+        }
+
         [HttpGet("/folders/check-exist/{id}")]
         public bool CheckExistById(int id)
         {
