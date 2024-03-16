@@ -1,5 +1,54 @@
-# .gitignore
+# ASP.NET Core
+.vscode/
+bin/
+obj/
+*.suo
+*.user
+*.dll
+*.exe
+*.pdb
+*.log
+*.vspscc
+.vscode
+.DS_Store
 
-# Yeni eklenen klasörlerin otomatik izlenmesini engellemek için
-**/bin/
-**/obj/
+# NuGet
+*.nuget.props
+*.paket/paket.exe
+*.paket/paket.targets
+paket-files/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Visual Studio files
+.vs/
+*.vspscc
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
