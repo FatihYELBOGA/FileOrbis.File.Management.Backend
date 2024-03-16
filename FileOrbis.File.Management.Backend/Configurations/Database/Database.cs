@@ -102,11 +102,11 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 {
                     database.Users.AddRange(users);
                     database.SaveChanges();
-                }
 
-                foreach (var user in users)
-                {
-                    Directory.CreateDirectory(user.RootFolder.Path);
+                    foreach (var user in users)
+                    {
+                        Directory.CreateDirectory(user.RootFolder.Path);
+                    }
                 }
             }
         }

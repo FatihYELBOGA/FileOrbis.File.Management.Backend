@@ -1,1 +1,5 @@
-.vs/
+# .gitignore
+
+# Yeni eklenen klasörlerin otomatik izlenmesini engellemek için
+**/bin/
+**/obj/
