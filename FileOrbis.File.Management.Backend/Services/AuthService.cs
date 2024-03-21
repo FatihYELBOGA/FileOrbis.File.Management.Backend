@@ -29,7 +29,7 @@ namespace FileOrbis.File.Management.Backend.Services
         {
             string signingKey = configuration.GetSection("JWTConfig:key").Value;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
                         new Claim(ClaimTypes.NameIdentifier, Convert.ToString(user.Id)),
