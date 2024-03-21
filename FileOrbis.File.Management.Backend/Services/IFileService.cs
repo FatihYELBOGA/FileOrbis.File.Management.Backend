@@ -8,6 +8,9 @@ namespace FileOrbis.File.Management.Backend.Services
     {
         public IActionResult GetById(int id);
         public FileResponse Add(AddFileRequest addFileRequests);
+        public FileResponse Rename(int id, string name);
+        public FileResponse Trash(int id);
+        public FileResponse Restore(int id);
         public bool DeleteById(int id);
 
     }

@@ -12,18 +12,13 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
 
         public UserResponse() { }
 
-        public UserResponse(User user) 
+        public UserResponse(User user, IConfiguration configuration) 
         {
             Id = user.Id;
             FirstName = user.FirstName;
             LastName = user.LastName;
             Email = user.Email;
-
-            if(user.RootFolder != null)
-            {
-                Folders = new FolderResponse(user.RootFolder);
-            }
-
+            Folders = new FolderResponse(user.RootFolder, configuration);
         }
 
     }

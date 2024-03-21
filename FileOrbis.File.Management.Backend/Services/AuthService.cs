@@ -13,14 +13,16 @@ namespace FileOrbis.File.Management.Backend.Services
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository authRepository;
-        private readonly IConfiguration configuration;
         private readonly IFolderService folderService;
+        private readonly IConfiguration configuration;
+        private readonly ILogger<AuthService> logger;
 
-        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IFolderService folderService)
+        public AuthService(IAuthRepository authRepository, IFolderService folderService, IConfiguration configuration, ILogger<AuthService> logger)
         {
             this.authRepository = authRepository;
-            this.configuration = configuration;
             this.folderService = folderService;
+            this.configuration = configuration;
+            this.logger = logger;
         }
 
         private JwtSecurityToken CreateToken(User user)
@@ -33,7 +35,7 @@ namespace FileOrbis.File.Management.Backend.Services
                         new Claim(ClaimTypes.NameIdentifier, Convert.ToString(user.Id)),
                         new Claim(JwtRegisteredClaimNames.Email, user.Email),
                         new Claim(ClaimTypes.Role, user.Role.ToString())
-                    };
+             };
             return new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddHours(Convert.ToInt64(configuration.GetSection("JWTConfig:token-expiration-hour").Value)),
@@ -160,6 +162,10 @@ namespace FileOrbis.File.Management.Backend.Services
                     };
                     authRepository.CreateRefreshToken(addedRefreshToken);
                 }
+                logger.LogInformation("user credentials is authenticated");
+            } else
+            {
+                logger.LogWarning("username or password is mistake!");
             }
 
             return loginResponse;
@@ -183,7 +189,7 @@ namespace FileOrbis.File.Management.Backend.Services
 
             FolderResponse rootFolder = folderService.Create(new CreateFolderRequest()
             {
-                Path = registerRequest.Email,
+                Name = registerRequest.Email,
                 ParentFolderId = null
             });
 
@@ -198,7 +204,7 @@ namespace FileOrbis.File.Management.Backend.Services
             };
 
             User returnedUser = authRepository.Register(addedUser);
-            return new UserResponse(returnedUser);
+            return new UserResponse(returnedUser, configuration);
         }
 
     }

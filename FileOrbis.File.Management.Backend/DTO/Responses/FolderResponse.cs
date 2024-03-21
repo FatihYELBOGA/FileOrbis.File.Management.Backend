@@ -9,15 +9,19 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
         public DateTime CreatedDate { get; set; }
         public DateTime LastModifiedDate { get; set; }
         public string Path { get; set; }
+        public int Trashed { get; set; }
         public List<FolderResponse> SubFolders { get; set; }
         public List<FileResponse> SubFiles { get; set; }
 
-        public FolderResponse(Folder folder) 
+        private IConfiguration configuration;
+
+        public FolderResponse(Folder folder, IConfiguration configuration) 
         {
             Id = folder.Id;
             Name = folder.Name;
             CreatedDate = folder.CreatedDate;
             Path = folder.Path;
+            Trashed = folder.Trashed;
             SubFolders = new List<FolderResponse>();
             SubFiles = new List<FileResponse>();
 
@@ -25,9 +29,12 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             {
                 foreach (var subfolder in folder.SubFolders)
                 {
-                    subfolder.SubFolders = null;
-                    subfolder.ParentFolder = null;
-                    SubFolders.Add(new FolderResponse(subfolder));
+                    if(subfolder.Trashed == 0)
+                    {
+                        subfolder.SubFolders = null;
+                        subfolder.ParentFolder = null;
+                        SubFolders.Add(new FolderResponse(subfolder, configuration));
+                    }
                 }
             }
 
@@ -35,8 +42,10 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             {
                 foreach (var subfile in folder.SubFiles)
                 {
-                    subfile.Folder = null;
-                    SubFiles.Add(new FileResponse(subfile));
+                    if(subfile.Trashed == 0)
+                    {
+                        SubFiles.Add(new FileResponse(subfile, configuration));
+                    }
                 }
             } 
 

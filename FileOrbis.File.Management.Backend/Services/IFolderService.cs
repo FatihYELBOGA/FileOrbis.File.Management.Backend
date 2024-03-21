@@ -8,7 +8,9 @@ namespace FileOrbis.File.Management.Backend.Services
         public FolderResponse GetById(int id);
         public FolderResponse GetByPath(string path);
         public FolderResponse Create(CreateFolderRequest createFolderRequest);
-        public bool HasFile(int id);
+        public FolderResponse Rename(int id, string name);
+        public FolderResponse Trash(int id);
+        public FolderResponse Restore(int id);
         public bool DeleteById(int id);
 
     }

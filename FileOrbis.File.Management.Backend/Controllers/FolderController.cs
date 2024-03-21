@@ -28,16 +28,28 @@ namespace FileOrbis.File.Management.Backend.Controllers
             return folderService.GetByPath(path);
         }
 
-        [HttpGet("/folders/check-exist/{id}")]
-        public bool CheckExistById(int id)
-        {
-            return folderService.HasFile(id);
-        }
-
         [HttpPost("/folders/create")]
         public FolderResponse Create([FromForm] CreateFolderRequest createFolderRequest)
         {
             return folderService.Create(createFolderRequest);
+        }
+
+        [HttpPut("/folders/rename/{id}")]
+        public FolderResponse Rename(int id, [FromQuery] string name)
+        {
+            return folderService.Rename(id, name);
+        }
+
+        [HttpPut("/folders/trash/{id}")]
+        public FolderResponse Trash(int id)
+        {
+            return folderService.Trash(id);
+        }
+
+        [HttpPut("/folders/restore/{id}")]
+        public FolderResponse Restore(int id)
+        {
+            return folderService.Restore(id);
         }
 
         [HttpDelete("/folders/{id}")]

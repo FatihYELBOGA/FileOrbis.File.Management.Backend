@@ -10,9 +10,9 @@ namespace FileOrbis.File.Management.Backend.Models
         public Role Role { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public RefreshToken? RefreshToken { get; set; }
-        public int? RootFolderId { get; set; }
-        public Folder? RootFolder { get; set; }
+        public RefreshToken RefreshToken { get; set; }
+        public int RootFolderId { get; set; }
+        public Folder RootFolder { get; set; }
 
     }
 

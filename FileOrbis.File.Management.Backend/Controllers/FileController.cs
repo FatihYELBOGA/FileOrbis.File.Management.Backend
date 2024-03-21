@@ -28,6 +28,24 @@ namespace FileOrbis.File.Management.Backend.Controllers
             return fileService.Add(addFileRequest);
         }
 
+        [HttpPut("/files/rename/{id}")]
+        public FileResponse Rename(int id, [FromQuery] string name)
+        {
+            return fileService.Rename(id, name);
+        }
+
+        [HttpPut("/files/trash/{id}")]
+        public FileResponse Trash(int id)
+        {
+            return fileService.Trash(id);
+        }
+
+        [HttpPut("/files/restore/{id}")]
+        public FileResponse Restore(int id)
+        {
+            return fileService.Restore(id);
+        }
+
         [HttpDelete("/files/{id}")]
         public bool DeleteById(int id)
         {

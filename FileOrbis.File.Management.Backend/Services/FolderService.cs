@@ -8,26 +8,30 @@ namespace FileOrbis.File.Management.Backend.Services
     public class FolderService : IFolderService
     {
         private readonly IFolderRepository folderRepository;
+        private readonly IFileService fileService;
         private readonly IConfiguration configuration;
+        private string mainFolderPath = "";
 
-        public FolderService(IFolderRepository folderRepository, IConfiguration configuration) 
+        public FolderService(IFolderRepository folderRepository, IFileService fileService , IConfiguration configuration) 
         {
             this.folderRepository = folderRepository;
+            this.fileService = fileService;
             this.configuration = configuration;
+            mainFolderPath = configuration.GetSection("MainFolderPath").Value;
         }
 
         public FolderResponse GetById(int id)
         {
             Folder foundFolder = folderRepository.GetById(id);
-            FolderResponse folderResponse = new FolderResponse(foundFolder);
-            string folderPath = Path.Combine(configuration.GetSection("MainFolderPath").Value, foundFolder.Path);
+            FolderResponse folderResponse = new FolderResponse(foundFolder, configuration);
+            string folderPath = Path.Combine(mainFolderPath, foundFolder.Path);
             folderResponse.LastModifiedDate = Directory.GetLastWriteTime(folderPath);
 
             foreach (var file in folderResponse.SubFiles)
             {
-                string filePath = file.Path;
-                FileInfo fileInfo = new FileInfo(filePath);
+                FileInfo fileInfo = new FileInfo(file.Path);
                 file.LastModifiedDate = fileInfo.LastWriteTime; 
+
                 double kb = (double)fileInfo.Length / 1024;
                 file.Size = kb.ToString("0") + " KB";
                 double mb;
@@ -36,7 +40,6 @@ namespace FileOrbis.File.Management.Backend.Services
                     mb = (double)kb / 1024;
                     file.Size = mb.ToString("0.00") + " MB";
                 }
-
             }
 
             return folderResponse;
@@ -45,7 +48,7 @@ namespace FileOrbis.File.Management.Backend.Services
         public FolderResponse GetByPath(string path)
         {
             Folder foundFolder = folderRepository.GetByPath(path);
-            FolderResponse folderResponse = new FolderResponse(foundFolder);
+            FolderResponse folderResponse = new FolderResponse(foundFolder, configuration);
             string folderPath = Path.Combine(configuration.GetSection("MainFolderPath").Value, foundFolder.Path);
             folderResponse.LastModifiedDate = Directory.GetLastWriteTime(folderPath);
 
@@ -54,36 +57,113 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public FolderResponse Create(CreateFolderRequest createFolderRequest)
         {
-            string path = Path.Combine(configuration.GetSection("MainFolderPath").Value, createFolderRequest.Path);
+            string folderPath = "";
+            if(createFolderRequest.ParentFolderId != null)
+                folderPath = folderRepository.GetById((int)createFolderRequest.ParentFolderId).Path + "/" + createFolderRequest.Name;
+            else
+                folderPath = createFolderRequest.Name;
+
+            string path = Path.Combine(mainFolderPath, folderPath);
             Directory.CreateDirectory(path);
 
-            string[] folderName = createFolderRequest.Path.Split('/');
             Folder newFolder = new Folder()
             {
-                Name = folderName[folderName.Length-1],  
+                Name = createFolderRequest.Name,  
                 CreatedDate = DateTime.Now,
                 ParentFolderId = createFolderRequest.ParentFolderId,
-                Path = createFolderRequest.Path
+                Path = folderPath,
+                Trashed = 0
             };
 
-            return new FolderResponse(folderRepository.Create(newFolder));
+            return new FolderResponse(folderRepository.Create(newFolder), configuration);
         }
 
-        public bool HasFile(int id)
+        public FolderResponse Rename(int id, string name)
         {
             Folder foundFolder = folderRepository.GetById(id);
-            return foundFolder.SubFiles.Count != 0 ? true : false;
+            if (foundFolder != null)
+            {
+                string newPath = "";
+                string[] paths = foundFolder.Path.Split("/");
+                for(int  i=0; i<paths.Length; i++)
+                {
+                    if(i != paths.Length - 1)
+                        newPath = newPath + paths[i] + "/";
+                    else
+                        newPath = newPath + name;
+                }
+
+                Directory.Move(Path.Combine(mainFolderPath, foundFolder.Path), Path.Combine(mainFolderPath, newPath));
+                
+                foundFolder.Name = name;
+                foundFolder.Path = newPath;
+                return new FolderResponse(folderRepository.Update(foundFolder), configuration);
+            }
+            else
+                throw new DirectoryNotFoundException();
         }
 
-        public bool DeleteById(int id)
+        public FolderResponse Trash(int id)
+        {
+            Folder foundFolder = folderRepository.GetById(id);
+            if (foundFolder != null)
+            {
+                foundFolder.Trashed = 1;
+                return new FolderResponse(folderRepository.Update(foundFolder), configuration);
+            }
+            else
+            {
+                throw new DirectoryNotFoundException();
+            }
+        }
+
+        public FolderResponse Restore(int id)
         {
             Folder foundFolder = folderRepository.CheckById(id);
             if (foundFolder != null)
             {
-                if (HasFile(id)) {
-                    return false;
+                foundFolder.Trashed = 0;
+                return new FolderResponse(folderRepository.Update(foundFolder), configuration);
+            }
+            else
+            {
+                throw new DirectoryNotFoundException();
+            }
+        }
+
+        public bool DeleteById(int id)
+        {
+            Folder foundFolder = folderRepository.GetById(id);
+            if (foundFolder != null)
+            {
+                int[] fileIds = new int[foundFolder.SubFiles.Count];
+                int counter = 0;
+                foreach (var file in foundFolder.SubFiles)
+                {
+                    fileIds[counter] = file.Id;
+                    counter++;
                 }
+
+                foreach (var fileId in fileIds)
+                {
+                    fileService.DeleteById(fileId);
+                }
+
+                counter = 0;
+                int[] folderIds = new int[foundFolder.SubFolders.Count];
+                foreach (var folder in foundFolder.SubFolders)
+                {
+                    folderIds[counter] = folder.Id;
+                    counter++;
+                }
+
+                foreach(var folderId in folderIds)
+                {
+                    DeleteById(folderId);
+                }
+
                 folderRepository.Delete(foundFolder);
+                Directory.Delete(Path.Combine(mainFolderPath, foundFolder.Path), true);
                 return true;
             }
 

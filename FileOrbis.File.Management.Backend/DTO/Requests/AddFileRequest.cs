@@ -2,9 +2,8 @@
 {
     public class AddFileRequest
     {
-        public string Path { get; set; }
         public IFormFile Content { get; set; }
-        public int? FolderId { get; set; }
+        public int FolderId { get; set; }
 
     }
 

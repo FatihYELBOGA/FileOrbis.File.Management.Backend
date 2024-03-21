@@ -56,10 +56,11 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 Role = Enumerations.Role.USER,
                 RootFolder = new Folder()
                 {
-                    Name = "fatihyelbogaaa@gmail.com",
+                    Name = "fatihyelboga@gmail.com",
                     CreatedDate = DateTime.Now,
                     ParentFolder = null,
-                    Path = "fatihyelbogaaa@gmail.com"
+                    Path = "fatihyelboga@gmail.com",
+                    Trashed = 0
                 }
             },
             new User
@@ -74,22 +75,24 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                     Name = "osmanaltunay@gmail.com",
                     CreatedDate = DateTime.Now,
                     ParentFolder = null,
-                    Path = "osmanaltunay@gmail.com"
+                    Path = "osmanaltunay@gmail.com",
+                    Trashed = 0
                 }
             },
             new User
             {
-                FirstName = "Berkay",
-                LastName = "BAYRAK",
-                Email = "berkaybayrak@gmail.com",
+                FirstName = "Enes",
+                LastName = "DEMIREL",
+                Email = "enesdemirel@gmail.com",
                 Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("berkay123")),
                 Role = Enumerations.Role.USER,
                 RootFolder = new Folder()
                 {
-                    Name = "berkaybayrak@gmail.com",
+                    Name = "enesdemirel@gmail.com",
                     CreatedDate = DateTime.Now,
                     ParentFolder = null,
-                    Path = "berkaybayrak@gmail.com"
+                    Path = "enesdemirel@gmail.com",
+                    Trashed = 0
                 }
             }
         };

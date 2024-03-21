@@ -9,14 +9,18 @@
         public string Path { get; set; }
         public DateTime LastModifiedDate { get; set; }
         public string Size { get; set; }
+        public int Trashed {  get; set;  }
 
-        public FileResponse(Models.File file) 
+        private IConfiguration configuration;
+
+        public FileResponse(Models.File file, IConfiguration configuration) 
         {
             Id = file.Id;
             Name = file.Name;
             Type = file.Type;
             CreatedDate = file.CreatedDate;
-            Path = file.Path;
+            Path = configuration.GetSection("MainFolderPath").Value + '/' + file.Folder.Path + '/' + file.Name;
+            Trashed  = file.Trashed;
         }
 
     }

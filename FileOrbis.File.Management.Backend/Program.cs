@@ -9,6 +9,8 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Serilog.Events;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // swagger oauth2 configuration
 builder.Services.AddSwaggerGen(
     options =>
@@ -34,6 +37,37 @@ builder.Services.AddSwaggerGen(
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     }
 );
+
+// logging configuration
+string logging = builder.Configuration.GetSection("loggingTo").Value;
+if (logging.Equals("file"))
+{
+    string loggingPath = builder.Configuration.GetSection("loggingPath").Value;
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File(loggingPath + "/log.txt",
+            rollingInterval: RollingInterval.Day)
+        .CreateLogger();
+
+    builder.Services.AddLogging(loggingBuilder =>
+        loggingBuilder.AddSerilog(dispose: true));
+}
+if (logging.Equals("database"))
+{
+    string connectionString = builder.Configuration.GetConnectionString("defaultConnection");
+
+    // Log to database configuration
+    Log.Logger = new LoggerConfiguration()
+           .WriteTo.MSSqlServer(connectionString: connectionString,
+                                 tableName: "Logs",
+                                 autoCreateSqlTable: true) // Tabloyu otomatik oluþtur
+           .CreateLogger();
+
+    builder.Services.AddLogging(loggingBuilder =>
+        loggingBuilder.AddSerilog(dispose: true));
+}
 
 // database configuration
 builder.Services.AddDbContext<Database>(

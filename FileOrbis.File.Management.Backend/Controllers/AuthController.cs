@@ -9,7 +9,6 @@ namespace FileOrbis.File.Management.Backend.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-
         private readonly IAuthService authService;
 
         public AuthController(IAuthService authService)

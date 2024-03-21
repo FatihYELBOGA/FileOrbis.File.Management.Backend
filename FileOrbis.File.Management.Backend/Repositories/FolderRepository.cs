@@ -13,19 +13,20 @@ namespace FileOrbis.File.Management.Backend.Repositories
             this.database = database;
         }
 
+        public Folder GetById(int id)
+        {
+            return database.Folders
+                .Where(f => f.Id == id && f.Trashed == 0)
+                .Include(f => f.SubFolders)
+                .Include(f => f.SubFiles)
+                    .ThenInclude(f => f.Folder)
+                .FirstOrDefault();
+        }
+
         public Folder CheckById(int id)
         {
             return database.Folders
                 .Where(f => f.Id == id)
-                .FirstOrDefault();
-        }
-
-        public Folder GetById(int id)
-        {
-            return database.Folders
-                .Where(f => f.Id == id)
-                .Include(f => f.SubFolders)
-                .Include(f => f.SubFiles)
                 .FirstOrDefault();
         }
 
@@ -39,6 +40,14 @@ namespace FileOrbis.File.Management.Backend.Repositories
         public Folder Create(Folder newFolder)
         {
             Folder returnedFolder = database.Folders.Add(newFolder).Entity;
+            database.SaveChanges();
+
+            return returnedFolder;
+        }
+
+        public Folder Update(Folder currentFolder)
+        {
+            Folder returnedFolder = database.Folders.Update(currentFolder).Entity;
             database.SaveChanges();
 
             return returnedFolder;
