@@ -2,6 +2,7 @@
 using FileOrbis.File.Management.Backend.DTO.Responses;
 using FileOrbis.File.Management.Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
 
 namespace FileOrbis.File.Management.Backend.Controllers
 {
@@ -19,7 +20,19 @@ namespace FileOrbis.File.Management.Backend.Controllers
         [HttpGet("/files/{id}")] 
         public IActionResult GetById(int id)
         {
-            return fileService.GetById(id);
+            return fileService.GetById(id); 
+        }
+
+        [HttpGet("/files/name/{id}")]
+        public ActionResult<string> GetNameById(int id)
+        {
+            return Ok(fileService.GetNameById(id));
+        }
+
+        [HttpGet("/files/trash")]
+        public List<FileResponse> GetAllTrashes()
+        {
+            return fileService.GetAllTrashes();
         }
 
         [HttpPost("/files/add")]

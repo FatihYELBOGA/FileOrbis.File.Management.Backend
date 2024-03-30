@@ -1,25 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FileOrbis.File.Management.Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class SeventhModel : Migration
+    public partial class DeletedDateColumnAddedToFileAndFolderTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Trashed",
+            migrationBuilder.AddColumn<DateTime>(
+                name: "DeletedDate",
                 table: "Folders",
-                type: "int",
+                type: "datetime2",
                 nullable: true);
 
-            migrationBuilder.AddColumn<int>(
-                name: "Trashed",
+            migrationBuilder.AddColumn<DateTime>(
+                name: "DeletedDate",
                 table: "Files",
-                type: "int",
+                type: "datetime2",
                 nullable: true);
         }
 
@@ -27,11 +28,11 @@ namespace FileOrbis.File.Management.Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Trashed",
+                name: "DeletedDate",
                 table: "Folders");
 
             migrationBuilder.DropColumn(
-                name: "Trashed",
+                name: "DeletedDate",
                 table: "Files");
         }
     }

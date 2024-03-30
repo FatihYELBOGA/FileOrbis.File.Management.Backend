@@ -10,8 +10,7 @@
         public DateTime LastModifiedDate { get; set; }
         public string Size { get; set; }
         public int Trashed {  get; set;  }
-
-        private IConfiguration configuration;
+        public DateTime? DeletedDate { get; set; }
 
         public FileResponse(Models.File file, IConfiguration configuration) 
         {
@@ -19,8 +18,9 @@
             Name = file.Name;
             Type = file.Type;
             CreatedDate = file.CreatedDate;
-            Path = configuration.GetSection("MainFolderPath").Value + '/' + file.Folder.Path + '/' + file.Name;
+            Path = file.Folder.Path + '/' + file.Name;
             Trashed  = file.Trashed;
+            DeletedDate = file.DeletedDate;
         }
 
     }

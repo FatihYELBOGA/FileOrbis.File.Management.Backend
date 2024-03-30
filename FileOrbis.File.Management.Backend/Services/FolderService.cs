@@ -2,6 +2,8 @@
 using FileOrbis.File.Management.Backend.DTO.Responses;
 using FileOrbis.File.Management.Backend.Models;
 using FileOrbis.File.Management.Backend.Repositories;
+using System.IO;
+using System.IO.Compression;
 
 namespace FileOrbis.File.Management.Backend.Services
 {
@@ -19,6 +21,55 @@ namespace FileOrbis.File.Management.Backend.Services
             this.configuration = configuration;
             mainFolderPath = configuration.GetSection("MainFolderPath").Value;
         }
+        public void AddFolderToZip(ZipArchive zipArchive, string folderPath, string parentFolder)
+        {
+            bool hasContent = Directory.GetFiles(folderPath).Length > 0 || Directory.GetDirectories(folderPath).Length > 0;
+
+            if (!hasContent)
+            {
+                zipArchive.CreateEntry(parentFolder);
+            }
+            else
+            {
+                foreach (string file in Directory.GetFiles(folderPath))
+                {
+                    if (fileService.GetIdByPath(file) != null)
+                    {
+                        zipArchive.CreateEntryFromFile(file, Path.Combine(parentFolder, Path.GetFileName(file)));
+                    }
+                }
+
+                foreach (string subFolder in Directory.GetDirectories(folderPath))
+                {
+                    string path_1 = NormalizePath(subFolder);
+                    string usernameFilter = path_1.Split(mainFolderPath)[1].Split("/")[1] + "/";
+                    if (GetIdByPath(path_1, usernameFilter) != null)
+                    {
+                        string subFolderEntryPath = Path.Combine(parentFolder, Path.GetFileName(subFolder)) + "/";
+                        AddFolderToZip(zipArchive, subFolder, subFolderEntryPath);
+                    }
+                }
+            }
+        }
+
+        static string NormalizePath(string path)
+        {
+            return path.Replace("\\", "/");
+        }
+
+        public int? GetIdByPath(string path, string filterPath)
+        {
+            foreach (var folder in folderRepository.GetAll(filterPath))
+            {
+                string path_2 = NormalizePath(Path.Combine(mainFolderPath, folder.Path));
+
+                if (path.Equals(path_2))
+                {
+                    return folder.Id;
+                }
+            }
+            return null;
+        }
 
         public FolderResponse GetById(int id)
         {
@@ -29,7 +80,7 @@ namespace FileOrbis.File.Management.Backend.Services
 
             foreach (var file in folderResponse.SubFiles)
             {
-                FileInfo fileInfo = new FileInfo(file.Path);
+                FileInfo fileInfo = new FileInfo(Path.Combine(mainFolderPath, file.Path));
                 file.LastModifiedDate = fileInfo.LastWriteTime; 
 
                 double kb = (double)fileInfo.Length / 1024;
@@ -43,6 +94,27 @@ namespace FileOrbis.File.Management.Backend.Services
             }
 
             return folderResponse;
+        }
+
+        public string GetNameById(int id)
+        {
+            return folderRepository.GetById(id).Name;
+        }
+
+        public string GetFolderPath(int id)
+        {
+            return Path.Combine(mainFolderPath, folderRepository.GetById(id).Path);
+        }
+
+        public List<FolderResponse> GetAllTrashes()
+        {
+            List<FolderResponse> folders = new List<FolderResponse>();
+            foreach (Folder folder in folderRepository.GetAllTrashes())
+            {
+                folders.Add(new FolderResponse(folder, configuration));
+            }
+
+            return folders;
         }
 
         public FolderResponse GetByPath(string path)
@@ -63,8 +135,7 @@ namespace FileOrbis.File.Management.Backend.Services
             else
                 folderPath = createFolderRequest.Name;
 
-            string path = Path.Combine(mainFolderPath, folderPath);
-            Directory.CreateDirectory(path);
+            Directory.CreateDirectory(mainFolderPath + "/" + folderPath);
 
             Folder newFolder = new Folder()
             {
@@ -90,13 +161,23 @@ namespace FileOrbis.File.Management.Backend.Services
                     if(i != paths.Length - 1)
                         newPath = newPath + paths[i] + "/";
                     else
-                        newPath = newPath + name;
+                        newPath += name;
                 }
 
                 Directory.Move(Path.Combine(mainFolderPath, foundFolder.Path), Path.Combine(mainFolderPath, newPath));
                 
                 foundFolder.Name = name;
+                string oldPath = foundFolder.Path;
                 foundFolder.Path = newPath;
+
+                foreach (var folder in folderRepository.GetAllStartsWith(oldPath + "/"))
+                {
+                    string remainingPartOfoldPath = folder.Path.Split(oldPath)[1];
+                    string currentPath = newPath + remainingPartOfoldPath;
+                    folder.Path = currentPath;
+                    folderRepository.Update(folder);
+                }
+
                 return new FolderResponse(folderRepository.Update(foundFolder), configuration);
             }
             else
@@ -109,6 +190,7 @@ namespace FileOrbis.File.Management.Backend.Services
             if (foundFolder != null)
             {
                 foundFolder.Trashed = 1;
+                foundFolder.DeletedDate = DateTime.Now;
                 return new FolderResponse(folderRepository.Update(foundFolder), configuration);
             }
             else
@@ -133,7 +215,7 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public bool DeleteById(int id)
         {
-            Folder foundFolder = folderRepository.GetById(id);
+            Folder foundFolder = folderRepository.CheckById(id);
             if (foundFolder != null)
             {
                 int[] fileIds = new int[foundFolder.SubFiles.Count];

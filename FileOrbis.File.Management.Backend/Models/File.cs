@@ -7,6 +7,7 @@
         public string Type { get; set; }
         public DateTime CreatedDate { get; set; }
         public int Trashed { get; set; }
+        public DateTime? DeletedDate { get; set; }
         public int FolderId { get; set; }
         public Folder Folder { get; set; }
 

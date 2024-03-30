@@ -7,7 +7,7 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
     public class Database : DbContext
     {
 
-        public Database(DbContextOptions options, IConfiguration configuration) : base(options)
+        public Database(DbContextOptions options) : base(options)
         {
 
         }
@@ -97,7 +97,7 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
             }
         };
 
-        public static void Seed(Database database)
+        public static void Seed(Database database, IConfiguration configuration)
         {
             if (database.Database.GetPendingMigrations().Count() == 0)
             {
@@ -108,7 +108,7 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
 
                     foreach (var user in users)
                     {
-                        Directory.CreateDirectory(user.RootFolder.Path);
+                        Directory.CreateDirectory(configuration.GetSection("MainFolderPath").Value + "/" + user.RootFolder.Path);
                     }
                 }
             }

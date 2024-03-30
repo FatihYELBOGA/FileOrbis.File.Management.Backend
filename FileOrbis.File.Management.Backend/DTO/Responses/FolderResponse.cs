@@ -10,10 +10,9 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
         public DateTime LastModifiedDate { get; set; }
         public string Path { get; set; }
         public int Trashed { get; set; }
+        public DateTime? DeletedDate { get; set; }
         public List<FolderResponse> SubFolders { get; set; }
         public List<FileResponse> SubFiles { get; set; }
-
-        private IConfiguration configuration;
 
         public FolderResponse(Folder folder, IConfiguration configuration) 
         {
@@ -22,6 +21,7 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             CreatedDate = folder.CreatedDate;
             Path = folder.Path;
             Trashed = folder.Trashed;
+            DeletedDate = folder.DeletedDate;
             SubFolders = new List<FolderResponse>();
             SubFiles = new List<FileResponse>();
 

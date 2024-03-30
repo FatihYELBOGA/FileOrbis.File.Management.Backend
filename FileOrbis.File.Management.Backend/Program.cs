@@ -118,7 +118,10 @@ builder.Services.AddTransient<IAuthRepository, AuthRepository>();
 
 var app = builder.Build();
 
-Database.Seed(app.Services.CreateScope().ServiceProvider.GetRequiredService<Database>());
+Database.Seed(
+    app.Services.CreateScope().ServiceProvider.GetRequiredService<Database>(), 
+    app.Services.CreateScope().ServiceProvider.GetRequiredService<IConfiguration>()
+);
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())

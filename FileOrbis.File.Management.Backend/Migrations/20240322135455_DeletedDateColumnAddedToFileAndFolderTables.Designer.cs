@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FileOrbis.File.Management.Backend.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20240309140049_FourthModel")]
-    partial class FourthModel
+    [Migration("20240322135455_DeletedDateColumnAddedToFileAndFolderTables")]
+    partial class DeletedDateColumnAddedToFileAndFolderTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,19 +36,18 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FolderId")
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FolderId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("Size")
-                        .HasColumnType("real");
+                    b.Property<int>("Trashed")
+                        .HasColumnType("int");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -72,11 +71,21 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ParentFolderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Trashed")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -139,14 +148,13 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RootFolderId")
+                    b.Property<int>("RootFolderId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RootFolderId")
-                        .IsUnique()
-                        .HasFilter("[RootFolderId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -156,7 +164,8 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.HasOne("FileOrbis.File.Management.Backend.Models.Folder", "Folder")
                         .WithMany("SubFiles")
                         .HasForeignKey("FolderId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Folder");
                 });
@@ -187,14 +196,16 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.HasOne("FileOrbis.File.Management.Backend.Models.Folder", "RootFolder")
                         .WithOne("RootFolderUser")
                         .HasForeignKey("FileOrbis.File.Management.Backend.Models.User", "RootFolderId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("RootFolder");
                 });
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.Folder", b =>
                 {
-                    b.Navigation("RootFolderUser");
+                    b.Navigation("RootFolderUser")
+                        .IsRequired();
 
                     b.Navigation("SubFiles");
 
@@ -203,7 +214,8 @@ namespace FileOrbis.File.Management.Backend.Migrations
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.User", b =>
                 {
-                    b.Navigation("RefreshToken");
+                    b.Navigation("RefreshToken")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -18,7 +18,9 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             FirstName = user.FirstName;
             LastName = user.LastName;
             Email = user.Email;
-            Folders = new FolderResponse(user.RootFolder, configuration);
+
+            if(user.RootFolder != null)
+                Folders = new FolderResponse(user.RootFolder, configuration);
         }
 
     }

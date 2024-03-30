@@ -10,7 +10,7 @@ namespace FileOrbis.File.Management.Backend.Services
         private readonly IFileRepository fileRepository;
         private IFolderRepository folderRepository; 
         private readonly IConfiguration configuration;
-        private string mainFolderPath = "";
+        private readonly string mainFolderPath = "";
 
         public FileService(IFileRepository fileRepository, IFolderRepository folderRepository, IConfiguration configuration)
         {
@@ -25,7 +25,7 @@ namespace FileOrbis.File.Management.Backend.Services
             Models.File foundFile = fileRepository.GetById(id);
             if (foundFile != null)
             {
-                FileStream fileStream = new FileStream(mainFolderPath + '/' + foundFile.Folder.Path + '/' + foundFile.Name  , FileMode.Open, FileAccess.Read);
+                FileStream fileStream = new FileStream(mainFolderPath + '/' + foundFile.Folder.Path + '/' + foundFile.Name, FileMode.Open, FileAccess.Read);
                 return new FileStreamResult(fileStream, "application/octet-stream")
                 {
                     FileDownloadName = Path.GetFileName(mainFolderPath + '/' + foundFile.Folder.Path + '/' + foundFile.Name)
@@ -33,6 +33,42 @@ namespace FileOrbis.File.Management.Backend.Services
             }
 
             return null;
+        }
+
+        public string GetNameById(int id)
+        {
+            return fileRepository.GetById(id).Name;
+        }
+
+        public int? GetIdByPath(string path)
+        {
+            foreach (var file in fileRepository.GetAll())
+            {
+                string path_1 = NormalizePath(path);
+                string path_2 = NormalizePath(Path.Combine(mainFolderPath, file.Folder.Path, file.Name));
+
+                if (path_1.Equals(path_2))
+                {
+                    return file.Id;
+                }
+            }
+            return null;
+        }
+
+        static string NormalizePath(string path)
+        {
+            return path.Replace("\\", "/");
+        }
+
+        public List<FileResponse> GetAllTrashes()
+        {
+            List<FileResponse> files = new List<FileResponse>();
+            foreach (Models.File file in fileRepository.GetAllTrashes())
+            {
+                files.Add(new FileResponse(file, configuration));
+            }
+
+            return files;
         }
 
         public FileResponse Add(AddFileRequest addFileRequest)
@@ -93,6 +129,7 @@ namespace FileOrbis.File.Management.Backend.Services
             if (foundFile != null)
             {
                 foundFile.Trashed = 1;
+                foundFile.DeletedDate = DateTime.Now;
                 return new FileResponse(fileRepository.Update(foundFile), configuration);
             }
             else
@@ -117,7 +154,7 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public bool DeleteById(int id)
         {
-            Models.File foundFile = fileRepository.GetById(id);
+            Models.File foundFile = fileRepository.CheckById(id);
             if (foundFile != null)
             {
                 fileRepository.Delete(foundFile);

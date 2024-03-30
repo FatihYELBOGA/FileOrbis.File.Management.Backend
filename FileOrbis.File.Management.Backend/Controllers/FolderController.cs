@@ -2,6 +2,7 @@
 using FileOrbis.File.Management.Backend.DTO.Responses;
 using FileOrbis.File.Management.Backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.IO.Compression;
 
 namespace FileOrbis.File.Management.Backend.Controllers
 {
@@ -20,6 +21,42 @@ namespace FileOrbis.File.Management.Backend.Controllers
         public FolderResponse GetById(int id)
         {
             return folderService.GetById(id);
+        }
+
+        [HttpGet("/folders/name/{id}")]
+        public ActionResult<string> GetNameById(int id)
+        {
+            return Ok(folderService.GetNameById(id));
+        }
+
+        [HttpGet("/folders/zip/{id}")]
+        public IActionResult GetZipFolderById(int id)
+        {
+            string folderPath = folderService.GetFolderPath(id);
+
+            string zipFileName = folderPath.Split("/")[^1] + ".zip"; 
+            try
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                    {
+                        folderService.AddFolderToZip(zipArchive, folderPath, "");
+                    }
+
+                    return File(memoryStream.ToArray(), "application/zip", zipFileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("/folders/trash")]
+        public List<FolderResponse> GetAllTrashes()
+        {
+            return folderService.GetAllTrashes();
         }
 
         [HttpGet("/folders/path")]

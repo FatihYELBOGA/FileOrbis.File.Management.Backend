@@ -13,6 +13,20 @@ namespace FileOrbis.File.Management.Backend.Repositories
             this.database = database;
         }
 
+        public List<Folder> GetAll(string filterPath)
+        {
+            return database.Folders
+                .Where(f => f.Trashed == 0 && f.Path.StartsWith(filterPath))
+                .ToList();
+        }
+
+        public List<Folder> GetAllStartsWith(string startsWith)
+        {
+            return database.Folders
+                .Where(f => f.Path.StartsWith(startsWith))
+                .ToList();
+        }
+
         public Folder GetById(int id)
         {
             return database.Folders
@@ -23,10 +37,20 @@ namespace FileOrbis.File.Management.Backend.Repositories
                 .FirstOrDefault();
         }
 
+        public List<Folder> GetAllTrashes()
+        {
+            return database.Folders
+                .Where(f => f.Trashed == 1)
+                .ToList();
+        }
+
         public Folder CheckById(int id)
         {
             return database.Folders
                 .Where(f => f.Id == id)
+                .Include(f => f.SubFolders)
+                .Include(f => f.SubFiles)
+                    .ThenInclude(f => f.Folder)
                 .FirstOrDefault();
         }
 
@@ -39,10 +63,10 @@ namespace FileOrbis.File.Management.Backend.Repositories
 
         public Folder Create(Folder newFolder)
         {
-            Folder returnedFolder = database.Folders.Add(newFolder).Entity;
+            Folder returnedFolder = database.Folders.Update(newFolder).Entity;
             database.SaveChanges();
 
-            return returnedFolder;
+            return GetById(returnedFolder.Id);
         }
 
         public Folder Update(Folder currentFolder)
@@ -50,7 +74,7 @@ namespace FileOrbis.File.Management.Backend.Repositories
             Folder returnedFolder = database.Folders.Update(currentFolder).Entity;
             database.SaveChanges();
 
-            return returnedFolder;
+            return CheckById(returnedFolder.Id);
         }
 
         public void Delete(Folder folder)
