@@ -10,7 +10,7 @@ namespace FileOrbis.File.Management.Backend.Services
         public FolderResponse GetById(int id);
         public string GetNameById(int id);
         public string GetFolderPath(int id);
-        public List<FolderResponse> GetAllTrashes();
+        public List<FolderResponse> GetAllTrashes(string username);
         public FolderResponse GetByPath(string path);
         public FolderResponse Create(CreateFolderRequest createFolderRequest);
         public FolderResponse Rename(int id, string name);

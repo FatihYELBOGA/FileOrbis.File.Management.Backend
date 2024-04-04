@@ -22,6 +22,10 @@ namespace FileOrbis.File.Management.Backend.DTO.Responses
             Path = folder.Path;
             Trashed = folder.Trashed;
             DeletedDate = folder.DeletedDate;
+
+            string folderPath = configuration.GetSection("MainFolderPath").Value + "/" + folder.Path;
+            LastModifiedDate = Directory.GetLastWriteTime(folderPath);
+
             SubFolders = new List<FolderResponse>();
             SubFiles = new List<FileResponse>();
 

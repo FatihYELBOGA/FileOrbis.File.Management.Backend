@@ -10,6 +10,7 @@
         public DateTime? DeletedDate { get; set; }
         public int FolderId { get; set; }
         public Folder Folder { get; set; }
+        public List<FavoriteFiles> InFavorites { get; set; }
 
     }
 

@@ -16,10 +16,11 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Models.File> Files { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<FavoriteFiles> FavoriteFiles { get; set; }
+        public DbSet<FavoriteFolders> FavoriteFolders { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.Entity<Folder>()
                 .HasOne(f => f.ParentFolder)
                 .WithMany(f => f.SubFolders)
@@ -43,15 +44,55 @@ namespace FileOrbis.File.Management.Backend.Configurations.Database
                 .WithOne(u => u.RefreshToken)
                 .HasForeignKey<RefreshToken>(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FavoriteFiles>()
+                .HasOne(ff => ff.File)
+                .WithMany(f => f.InFavorites)
+                .HasForeignKey(f => f.FileId)
+                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FavoriteFiles>()
+                .HasOne(ff => ff.User)
+                .WithMany(u => u.FavoriteFiles)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FavoriteFolders>()
+                .HasOne(ff => ff.Folder)
+                .WithMany(f => f.InFavorites)
+                .HasForeignKey(f => f.FolderId)
+                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<FavoriteFolders>()
+                .HasOne(ff => ff.User)
+                .WithMany(u => u.FavoriteFolders)
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(deleteBehavior: DeleteBehavior.NoAction);
         }
 
         private static User[] users =
-        {
+        {   
+            new User
+            {
+                FirstName = "Korhan",
+                LastName = "KONARAY",
+                Email = "korhankonaray@gmail.com",
+                Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("korhan123")),
+                Role = Enumerations.Role.USER,
+                RootFolder = new Folder()
+                {
+                    Name = "korhankonaray@gmail.com",
+                    CreatedDate = DateTime.Now,
+                    ParentFolder = null,
+                    Path = "korhankonaray@gmail.com",
+                    Trashed = 0
+                }
+            },
             new User
             {
                 FirstName = "Fatih",
                 LastName = "YELBOGA",
-                Email = "fatihyelbogaaa@gmail.com",
+                Email = "fatihyelboga@gmail.com",
                 Password = Convert.ToBase64String(Encoding.UTF8.GetBytes("fatih123")),
                 Role = Enumerations.Role.USER,
                 RootFolder = new Folder()

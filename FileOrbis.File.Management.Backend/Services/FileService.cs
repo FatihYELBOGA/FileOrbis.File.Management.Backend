@@ -10,14 +10,16 @@ namespace FileOrbis.File.Management.Backend.Services
         private readonly IFileRepository fileRepository;
         private IFolderRepository folderRepository; 
         private readonly IConfiguration configuration;
+        private readonly IUserRepository userRepository;
         private readonly string mainFolderPath = "";
 
-        public FileService(IFileRepository fileRepository, IFolderRepository folderRepository, IConfiguration configuration)
+        public FileService(IFileRepository fileRepository, IFolderRepository folderRepository,  IConfiguration configuration, IUserRepository userRepository)
         {
             this.fileRepository = fileRepository;
             this.folderRepository = folderRepository;
             this.configuration = configuration;
             mainFolderPath = configuration.GetSection("MainFolderPath").Value;
+            this.userRepository = userRepository;
         }
 
         public IActionResult GetById(int id)
@@ -60,10 +62,10 @@ namespace FileOrbis.File.Management.Backend.Services
             return path.Replace("\\", "/");
         }
 
-        public List<FileResponse> GetAllTrashes()
+        public List<FileResponse> GetAllTrashes(string username)
         {
             List<FileResponse> files = new List<FileResponse>();
-            foreach (Models.File file in fileRepository.GetAllTrashes())
+            foreach (Models.File file in fileRepository.GetAllTrashes(username))
             {
                 files.Add(new FileResponse(file, configuration));
             }
@@ -157,6 +159,14 @@ namespace FileOrbis.File.Management.Backend.Services
             Models.File foundFile = fileRepository.CheckById(id);
             if (foundFile != null)
             {
+                if (foundFile.InFavorites != null)
+                {
+                    for (int i = 0; i < foundFile.InFavorites.Count; i++)
+                    {
+                        userRepository.DeleteFavoriteFileById(foundFile.InFavorites[i].Id);
+                    }
+                }
+
                 fileRepository.Delete(foundFile);
 
                 using (var fileStream = new FileStream(mainFolderPath + '/' + foundFile.Folder.Path + '/' + foundFile.Name, FileMode.Open))

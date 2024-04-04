@@ -23,16 +23,17 @@ namespace FileOrbis.File.Management.Backend.Repositories
         public Models.File GetById(int id)
         {
             return database.Files
-                .Where(f => f.Id == id && f.Trashed == 0)
+                .Where(f => f.Id == id)
                 .Include(f => f.Folder)
                 .FirstOrDefault();
         }
 
-        public List<Models.File> GetAllTrashes() 
+        public List<Models.File> GetAllTrashes(string username) 
         {
             return database.Files
                 .Where(f => f.Trashed == 1)
                 .Include(f => f.Folder)
+                .Where(f => f.Folder.Path.StartsWith(username))
                 .ToList();
         }
 
@@ -41,6 +42,7 @@ namespace FileOrbis.File.Management.Backend.Repositories
             return database.Files
                 .Where(f => f.Id == id)
                 .Include(f => f.Folder)
+                .Include(f => f.InFavorites)
                 .FirstOrDefault();
         }
 

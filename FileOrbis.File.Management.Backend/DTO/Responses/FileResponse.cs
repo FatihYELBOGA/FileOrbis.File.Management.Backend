@@ -18,8 +18,21 @@
             Name = file.Name;
             Type = file.Type;
             CreatedDate = file.CreatedDate;
-            Path = file.Folder.Path + '/' + file.Name;
-            Trashed  = file.Trashed;
+            Path = file.Folder.Path;
+
+            FileInfo fileInfo = new FileInfo(configuration.GetSection("MainFolderPath").Value + "/" + Path + "/" + file.Name);
+            LastModifiedDate = fileInfo.LastWriteTime;
+
+            double kb = (double)fileInfo.Length / 1024;
+            Size = kb.ToString("0") + " KB";
+            double mb;
+            if (kb >= 1024)
+            {
+                mb = (double)kb / 1024;
+                Size = mb.ToString("0.00") + " MB";
+            }
+
+            Trashed = file.Trashed;
             DeletedDate = file.DeletedDate;
         }
 

@@ -13,6 +13,8 @@ namespace FileOrbis.File.Management.Backend.Models
         public RefreshToken RefreshToken { get; set; }
         public int RootFolderId { get; set; }
         public Folder RootFolder { get; set; }
+        public List<FavoriteFolders> FavoriteFolders { get; set; }
+        public List<FavoriteFiles> FavoriteFiles { get; set; }
 
     }
 

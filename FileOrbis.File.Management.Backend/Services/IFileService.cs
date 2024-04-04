@@ -9,7 +9,7 @@ namespace FileOrbis.File.Management.Backend.Services
         public IActionResult GetById(int id);
         public string GetNameById(int id);
         public int? GetIdByPath(string path);
-        public List<FileResponse> GetAllTrashes();
+        public List<FileResponse> GetAllTrashes(string username);
         public FileResponse Add(AddFileRequest addFileRequests);
         public FileResponse Rename(int id, string name);
         public FileResponse Trash(int id);

@@ -37,10 +37,10 @@ namespace FileOrbis.File.Management.Backend.Repositories
                 .FirstOrDefault();
         }
 
-        public List<Folder> GetAllTrashes()
+        public List<Folder> GetAllTrashes(string username)
         {
             return database.Folders
-                .Where(f => f.Trashed == 1)
+                .Where(f => f.Trashed == 1 && f.Path.StartsWith(username))
                 .ToList();
         }
 
@@ -51,6 +51,9 @@ namespace FileOrbis.File.Management.Backend.Repositories
                 .Include(f => f.SubFolders)
                 .Include(f => f.SubFiles)
                     .ThenInclude(f => f.Folder)
+                .Include(f => f.SubFiles)
+                    .ThenInclude(f => f.InFavorites)
+                .Include(f => f.InFavorites)
                 .FirstOrDefault();
         }
 

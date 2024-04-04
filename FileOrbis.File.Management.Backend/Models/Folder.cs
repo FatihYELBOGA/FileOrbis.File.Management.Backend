@@ -13,6 +13,7 @@
         public User RootFolderUser { get; set; }
         public List<Folder> SubFolders { get; set; }
         public List<File> SubFiles { get; set; }
+        public List<FavoriteFolders> InFavorites { get; set; }
 
     }
 

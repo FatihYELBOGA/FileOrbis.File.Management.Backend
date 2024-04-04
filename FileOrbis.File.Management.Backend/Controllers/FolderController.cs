@@ -53,10 +53,10 @@ namespace FileOrbis.File.Management.Backend.Controllers
             }
         }
 
-        [HttpGet("/folders/trash")]
-        public List<FolderResponse> GetAllTrashes()
+        [HttpGet("/folders/trash/{username}")]
+        public List<FolderResponse> GetAllTrashes(string username)
         {
-            return folderService.GetAllTrashes();
+            return folderService.GetAllTrashes(username);
         }
 
         [HttpGet("/folders/path")]
