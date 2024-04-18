@@ -7,7 +7,8 @@ namespace FileOrbis.File.Management.Backend.Services
     public interface IFolderService
     {
         public void AddFolderToZip(ZipArchive zipArchive, string folderPath, string parentFolder);
-        public FolderResponse GetById(int id);
+        public FolderResponse GetById(int folderId, int userId);
+        public bool CheckNameExists(string name, int parentFolderId);
         public string GetNameById(int id);
         public string GetFolderPath(int id);
         public List<FolderResponse> GetAllTrashes(string username);

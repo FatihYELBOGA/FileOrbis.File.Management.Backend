@@ -33,11 +33,23 @@ namespace FileOrbis.File.Management.Backend.Repositories
         {
             return database.Users
                 .Where(u => u.Id == userId)
-                .Include(u => u.FavoriteFolders.Where(ff => ff.Folder.Trashed == 0))
+                .Include(u => u.FavoriteFolders)
                     .ThenInclude(f => f.Folder)
-                .Include(u => u.FavoriteFiles.Where(ff => ff.File.Trashed == 0))
+                .Include(u => u.FavoriteFiles)
                     .ThenInclude(f => f.File)
-                        .ThenInclude(f=> f.Folder)
+                    .ThenInclude(f => f.Folder)
+                .FirstOrDefault();
+        }
+
+        public User GetFavoritesByUsername(string username)
+        {
+            return database.Users
+                .Where(u => u.Email.StartsWith(username))
+                .Include(u => u.FavoriteFolders)
+                    .ThenInclude(f => f.Folder)
+                .Include(u => u.FavoriteFiles)
+                    .ThenInclude(f => f.File)
+                    .ThenInclude(f => f.Folder)
                 .FirstOrDefault();
         }
 

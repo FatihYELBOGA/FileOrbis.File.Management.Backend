@@ -8,11 +8,15 @@ namespace FileOrbis.File.Management.Backend.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
+        private readonly IFolderRepository folderRepository;
+        private readonly IFileRepository fileRepository;
         private readonly IConfiguration configuration;
 
-        public UserService(IUserRepository userRepository, IConfiguration configuration)
+        public UserService(IUserRepository userRepository, IFolderRepository folderRepository, IFileRepository fileRepository, IConfiguration configuration)
         {
             this.userRepository = userRepository;
+            this.folderRepository = folderRepository;
+            this.fileRepository = fileRepository;
             this.configuration = configuration;
         }
 
@@ -35,6 +39,46 @@ namespace FileOrbis.File.Management.Backend.Services
         public UserResponse GetFavoritesById(int userId)
         {
             return new UserResponse(userRepository.GetFavoritesById(userId), configuration);
+        }
+
+        public string CheckFileInTrash(int fileId, string username)
+        {
+            return CheckFolderInTrash(fileRepository.GetFileWithParentFolder(fileId).Folder.Id, username);
+        }
+
+        public string CheckFolderInTrash(int folderId, string username)
+        {
+            List<Folder> folders = folderRepository.GetAllTrashes(username);
+            for (int i = 0; i < folders.Count; i++)
+            {
+                Folder folderWithParent = folderRepository.GetFolderWithParentFolder(folderId);
+                Folder trashFolder = folders[i];
+                if (trashFolder.Id == folderId)
+                {
+                    return "true";
+                }
+
+                folderWithParent = folderWithParent.ParentFolder;
+                do
+                {
+                    if (folderWithParent == null)
+                    {
+                        return "false";
+                    }
+                    else
+                    {
+                        if(folderWithParent.Trashed == 1)
+                        {
+                            return "true";
+                        }
+                        else
+                        {
+                            folderWithParent = folderRepository.GetFolderWithParentFolder(folderWithParent.Id).ParentFolder;
+                        }
+                    }
+                } while (folderWithParent != null);
+            }
+            return "false";
         }
 
         public UserResponse AddFavoriteFile(AddFavoriteFileRequest addFavoriteFile)

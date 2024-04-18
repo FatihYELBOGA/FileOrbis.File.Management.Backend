@@ -89,6 +89,9 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("RecentDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Trashed")
                         .HasColumnType("int");
 

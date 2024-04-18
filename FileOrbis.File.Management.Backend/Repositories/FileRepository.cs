@@ -1,4 +1,5 @@
 ﻿using FileOrbis.File.Management.Backend.Configurations.Database;
+using FileOrbis.File.Management.Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace FileOrbis.File.Management.Backend.Repositories
@@ -12,11 +13,37 @@ namespace FileOrbis.File.Management.Backend.Repositories
             this.database = database;
         }
 
+        public Models.File GetFileWithParentFolder(int fileId)
+        {
+            return database.Files
+                .Where(f => f.Id == fileId)
+                .Include(f => f.Folder)
+                    .ThenInclude(f => f.ParentFolder)
+                .FirstOrDefault();
+        }
+
         public List<Models.File> GetAll()
         {
             return database.Files
                 .Where(f => f.Trashed == 0)
                 .Include(f => f.Folder)
+                .ToList();
+        }
+        public List<Models.File> GetAllByUsername(string username)
+        {
+            return database.Files
+                .Include(f => f.Folder)
+                    .ThenInclude(f => f.ParentFolder)
+                .Where(f => f.Folder.Path.StartsWith(username))
+                .ToList();
+        }
+
+        public List<Models.File> GetAllRecents(string username)
+        {
+            return database.Files
+                .Where(f =>f.RecentDate != null)
+                .Include(f => f.Folder)
+                .Where(f => f.Folder.Path.StartsWith(username))
                 .ToList();
         }
 
@@ -33,6 +60,7 @@ namespace FileOrbis.File.Management.Backend.Repositories
             return database.Files
                 .Where(f => f.Trashed == 1)
                 .Include(f => f.Folder)
+                    .ThenInclude(f => f.ParentFolder)
                 .Where(f => f.Folder.Path.StartsWith(username))
                 .ToList();
         }
@@ -59,7 +87,7 @@ namespace FileOrbis.File.Management.Backend.Repositories
             Models.File returnedFile = database.Files.Update(currentFile).Entity;
             database.SaveChanges();
 
-            return CheckById(returnedFile.Id);
+            return GetById(returnedFile.Id);
         }
 
         public void Delete(Models.File file)

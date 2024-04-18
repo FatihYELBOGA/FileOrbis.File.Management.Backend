@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FileOrbis.File.Management.Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class firstmodel : Migration
+    public partial class firstModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,6 +21,7 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Path = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Trashed = table.Column<int>(type: "int", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ParentFolderId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -42,7 +43,9 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RecentDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Trashed = table.Column<int>(type: "int", nullable: false),
+                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     FolderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -79,6 +82,54 @@ namespace FileOrbis.File.Management.Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FavoriteFiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FileId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FavoriteFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FavoriteFiles_Files_FileId",
+                        column: x => x.FileId,
+                        principalTable: "Files",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FavoriteFiles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FavoriteFolders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FolderId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FavoriteFolders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FavoriteFolders_Folders_FolderId",
+                        column: x => x.FolderId,
+                        principalTable: "Folders",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FavoriteFolders_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
@@ -97,6 +148,26 @@ namespace FileOrbis.File.Management.Backend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FavoriteFiles_FileId",
+                table: "FavoriteFiles",
+                column: "FileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FavoriteFiles_UserId",
+                table: "FavoriteFiles",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FavoriteFolders_FolderId",
+                table: "FavoriteFolders",
+                column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FavoriteFolders_UserId",
+                table: "FavoriteFolders",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Files_FolderId",
@@ -125,10 +196,16 @@ namespace FileOrbis.File.Management.Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Files");
+                name: "FavoriteFiles");
+
+            migrationBuilder.DropTable(
+                name: "FavoriteFolders");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "Files");
 
             migrationBuilder.DropTable(
                 name: "Users");

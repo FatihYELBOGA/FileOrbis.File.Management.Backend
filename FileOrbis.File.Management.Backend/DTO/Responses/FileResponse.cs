@@ -7,10 +7,12 @@
         public string Type { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Path { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime? LastModifiedDate { get; set; }
+        public DateTime?  RecentDate { get; set; }
         public string Size { get; set; }
         public int Trashed {  get; set;  }
         public DateTime? DeletedDate { get; set; }
+        public bool Starred { get; set; }
 
         public FileResponse(Models.File file, IConfiguration configuration) 
         {
@@ -18,7 +20,9 @@
             Name = file.Name;
             Type = file.Type;
             CreatedDate = file.CreatedDate;
+            RecentDate = file.RecentDate;
             Path = file.Folder.Path;
+            Starred = file.Starred;
 
             FileInfo fileInfo = new FileInfo(configuration.GetSection("MainFolderPath").Value + "/" + Path + "/" + file.Name);
             LastModifiedDate = fileInfo.LastWriteTime;

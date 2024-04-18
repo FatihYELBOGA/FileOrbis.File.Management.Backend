@@ -1,4 +1,5 @@
 ﻿using FileOrbis.File.Management.Backend.Configurations.Database;
+using FileOrbis.File.Management.Backend.DTO.Requests;
 using FileOrbis.File.Management.Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,15 @@ namespace FileOrbis.File.Management.Backend.Repositories
         {
             this.database = database;
         }
+
+        public Folder GetFolderWithParentFolder(int folderId)
+        {
+            return database.Folders
+                .Where(f => f.Id == folderId)
+                .Include(f => f.ParentFolder)
+                .FirstOrDefault();
+        }
+    
 
         public List<Folder> GetAll(string filterPath)
         {
@@ -32,15 +42,51 @@ namespace FileOrbis.File.Management.Backend.Repositories
             return database.Folders
                 .Where(f => f.Id == id && f.Trashed == 0)
                 .Include(f => f.SubFolders)
+                    .ThenInclude(f => f.InFavorites)
+                .Include(f => f.SubFiles)
+                    .ThenInclude(f => f.Folder)
+                .Include(f => f.SubFiles)
+                    .ThenInclude(f => f.InFavorites)
+                .FirstOrDefault();
+        }
+        public bool CheckNameExists(string name, int parentFolderId)
+        {
+            Folder folder = database.Folders
+                .Where(f => f.Id == parentFolderId)
+                .Include(f => f.SubFolders)
                 .Include(f => f.SubFiles)
                     .ThenInclude(f => f.Folder)
                 .FirstOrDefault();
+
+            if(folder.SubFolders != null)
+            {
+                foreach (var item in folder.SubFolders)
+                {
+                    if (item.Name.Equals(name.Trim()))
+                    {
+                        return true;
+                    }
+                }
+            }
+            if(folder.SubFiles != null)
+            {
+                foreach (var item in folder.SubFiles)
+                {
+                    if (item.Name.Equals(name.Trim()))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public List<Folder> GetAllTrashes(string username)
         {
             return database.Folders
                 .Where(f => f.Trashed == 1 && f.Path.StartsWith(username))
+                .Include(f => f.ParentFolder)
                 .ToList();
         }
 

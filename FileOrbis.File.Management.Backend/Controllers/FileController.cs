@@ -16,10 +16,45 @@ namespace FileOrbis.File.Management.Backend.Controllers
             this.fileService = fileService;
         }
 
-        [HttpGet("/files/{id}")] 
-        public IActionResult GetById(int id)
+        [HttpGet("/files/storage/{username}")]
+        public List<StorageResponse> GetStorageDetails(string username)
         {
-            return fileService.GetById(id); 
+            return fileService.GetStorageDetails(username);
+        }
+
+        [HttpGet("/files/recent/{username}")]
+        public List<FileResponse> GetAllRecents(string username)
+        {
+            return fileService.GetAllRecents(username);
+        } 
+
+        [HttpGet("/files/download/{id}")] 
+        public IActionResult GetDownloadFileById(int id)
+        {
+            return fileService.GetDownloadFileById(id); 
+        }
+
+        [HttpGet("/files/stream/{id}")]
+        public IActionResult GetStreamFileById(int id)
+        {
+            string[] splitNamesByDot = fileService.GetById(id).Name.Split(".");
+            if(splitNamesByDot.Length > 0)
+            {
+                string extension = splitNamesByDot[splitNamesByDot.Length - 1];
+                FileStream fileStream = new FileStream(fileService.GetPathById(id), FileMode.Open, FileAccess.Read);
+                switch (extension)
+                {
+                    case "jpg":
+                        return File(fileStream, "image/jpeg");
+                    case "jpeg":
+                        return File(fileStream, "image/jpeg");
+                    case "png":
+                        return File(fileStream, "image/png");
+                    case "pdf":
+                        return File(fileStream, "application/pdf");
+                }
+            }
+            return null;
         }
 
         [HttpGet("/files/name/{id}")]
@@ -38,6 +73,12 @@ namespace FileOrbis.File.Management.Backend.Controllers
         public FileResponse Add([FromForm] AddFileRequest addFileRequest)
         {
             return fileService.Add(addFileRequest);
+        }
+
+        [HttpPut("/files/recent/{id}")]
+        public FileResponse UpdateRecentDate(int id)
+        {
+            return fileService.UpdateRecentDate(id);
         }
 
         [HttpPut("/files/rename/{id}")]

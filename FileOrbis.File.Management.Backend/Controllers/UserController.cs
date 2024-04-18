@@ -34,6 +34,18 @@ namespace FileOrbis.File.Management.Backend.Controllers
             return userService.GetFavoritesById(userId);
         }
 
+        [HttpGet("/users/check-file-in-trash")]
+        public string CheckFileInTrash([FromQuery] int fileId, [FromQuery] string username)
+        {
+            return userService.CheckFileInTrash(fileId, username);
+        }
+
+        [HttpGet("/users/check-folder-in-trash")]
+        public string CheckFolderInTrash([FromQuery] int folderId, [FromQuery] string username)
+        {
+            return userService.CheckFolderInTrash(folderId, username);
+        }
+
         [HttpPost("/users/favorites/file")]
         public UserResponse AddFavoriteFile([FromForm] AddFavoriteFileRequest addFavoriteFile)
         {

@@ -11,7 +11,6 @@ namespace FileOrbis.File.Management.Backend.Services
         public LoginResponse Login(LoginRequest loginRequest);
         public UserResponse Register(RegisterRequest registerRequest);
 
-
     }
 
 }

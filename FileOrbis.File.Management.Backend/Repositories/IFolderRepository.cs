@@ -4,9 +4,11 @@ namespace FileOrbis.File.Management.Backend.Repositories
 {
     public interface IFolderRepository
     {
+        public Folder GetFolderWithParentFolder(int folderId);
         public List<Folder> GetAll(string filterPath);
         public List<Folder> GetAllStartsWith(string startsWith);
         public Folder GetById(int id);
+        public bool CheckNameExists(string name, int parentFolderId);
         public List<Folder> GetAllTrashes(string username);
         public Folder CheckById(int id);
         public Folder GetByPath(string path);

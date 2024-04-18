@@ -73,11 +73,39 @@ namespace FileOrbis.File.Management.Backend.Services
             return null;
         }
 
-        public FolderResponse GetById(int id)
+        public FolderResponse GetById(int folderId, int userId)
         {
-            Folder foundFolder = folderRepository.GetById(id);
+            Folder foundFolder = folderRepository.GetById(folderId);
+            foreach (var folder in foundFolder.SubFolders)
+            {
+                foreach (var subFavorites in folder.InFavorites)
+                {
+                    if(subFavorites.UserId == userId)
+                    {
+                        folder.Starred = true;
+                        break;
+                    }
+                }
+            }
+            foreach (var file in foundFolder.SubFiles)
+            {
+                foreach (var subFavorites in file.InFavorites)
+                {
+                    if(subFavorites.UserId  == userId)
+                    {
+                        file.Starred = true;
+                        break;
+                    }
+                }
+            }
+
             FolderResponse folderResponse = new FolderResponse(foundFolder, configuration);
             return folderResponse;
+        }
+
+        public bool CheckNameExists(string name, int parentFolderId)
+        {
+            return folderRepository.CheckNameExists(name, parentFolderId);
         }
 
         public string GetNameById(int id)
@@ -92,9 +120,19 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public List<FolderResponse> GetAllTrashes(string username)
         {
+            User user = userRepository.GetFavoritesByUsername(username);
             List<FolderResponse> folders = new List<FolderResponse>();
             foreach (Folder folder in folderRepository.GetAllTrashes(username))
             {
+                foreach (var favFolder in user.FavoriteFolders)
+                {
+                    if (folder.Id == favFolder.Folder.Id)
+                    {
+                        folder.Starred = true;
+                    }
+                }
+                folder.SubFolders = null;
+                folder.SubFiles = null;
                 folders.Add(new FolderResponse(folder, configuration));
             }
 
@@ -113,13 +151,13 @@ namespace FileOrbis.File.Management.Backend.Services
 
         public FolderResponse Create(CreateFolderRequest createFolderRequest)
         {
-            string folderPath = "";
-            if(createFolderRequest.ParentFolderId != null)
+            string folderPath;
+            if (createFolderRequest.ParentFolderId != null)
                 folderPath = folderRepository.GetById((int)createFolderRequest.ParentFolderId).Path + "/" + createFolderRequest.Name;
             else
                 folderPath = createFolderRequest.Name;
 
-            Directory.CreateDirectory(mainFolderPath + "/" + folderPath);
+            Directory.CreateDirectory(mainFolderPath + "/" + folderPath.Trim());
 
             Folder newFolder = new Folder()
             {

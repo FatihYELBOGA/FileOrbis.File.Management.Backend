@@ -1,4 +1,6 @@
-﻿namespace FileOrbis.File.Management.Backend.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FileOrbis.File.Management.Backend.Models
 {
     public class Folder
     {
@@ -8,6 +10,9 @@
         public string Path { get; set; }
         public int Trashed {  get; set; }
         public DateTime? DeletedDate { get; set; }
+
+        [NotMapped]
+        public bool Starred { get; set; }
         public int? ParentFolderId {  get; set; } 
         public Folder? ParentFolder { get; set; }
         public User RootFolderUser { get; set; }

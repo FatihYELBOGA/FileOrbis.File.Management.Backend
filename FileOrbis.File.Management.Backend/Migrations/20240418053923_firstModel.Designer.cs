@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FileOrbis.File.Management.Backend.Migrations
 {
     [DbContext(typeof(Database))]
-    [Migration("20240322135455_DeletedDateColumnAddedToFileAndFolderTables")]
-    partial class DeletedDateColumnAddedToFileAndFolderTables
+    [Migration("20240418053923_firstModel")]
+    partial class firstModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,52 @@ namespace FileOrbis.File.Management.Backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.FavoriteFiles", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FileId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FavoriteFiles");
+                });
+
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.FavoriteFolders", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FolderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FolderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("FavoriteFolders");
+                });
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.File", b =>
                 {
@@ -45,6 +91,9 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RecentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Trashed")
                         .HasColumnType("int");
@@ -159,6 +208,44 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.FavoriteFiles", b =>
+                {
+                    b.HasOne("FileOrbis.File.Management.Backend.Models.File", "File")
+                        .WithMany("InFavorites")
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FileOrbis.File.Management.Backend.Models.User", "User")
+                        .WithMany("FavoriteFiles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("File");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.FavoriteFolders", b =>
+                {
+                    b.HasOne("FileOrbis.File.Management.Backend.Models.Folder", "Folder")
+                        .WithMany("InFavorites")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("FileOrbis.File.Management.Backend.Models.User", "User")
+                        .WithMany("FavoriteFolders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Folder");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.File", b =>
                 {
                     b.HasOne("FileOrbis.File.Management.Backend.Models.Folder", "Folder")
@@ -202,8 +289,15 @@ namespace FileOrbis.File.Management.Backend.Migrations
                     b.Navigation("RootFolder");
                 });
 
+            modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.File", b =>
+                {
+                    b.Navigation("InFavorites");
+                });
+
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.Folder", b =>
                 {
+                    b.Navigation("InFavorites");
+
                     b.Navigation("RootFolderUser")
                         .IsRequired();
 
@@ -214,6 +308,10 @@ namespace FileOrbis.File.Management.Backend.Migrations
 
             modelBuilder.Entity("FileOrbis.File.Management.Backend.Models.User", b =>
                 {
+                    b.Navigation("FavoriteFiles");
+
+                    b.Navigation("FavoriteFolders");
+
                     b.Navigation("RefreshToken")
                         .IsRequired();
                 });

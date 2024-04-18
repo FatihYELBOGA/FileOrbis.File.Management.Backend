@@ -17,10 +17,16 @@ namespace FileOrbis.File.Management.Backend.Controllers
             this.folderService = folderService;
         }
 
-        [HttpGet("/folders/{id}")]
-        public FolderResponse GetById(int id)
+        [HttpGet("/folders")]
+        public FolderResponse GetById([FromQuery] int folderId, [FromQuery] int userId)
         {
-            return folderService.GetById(id);
+            return folderService.GetById(folderId, userId);
+        }
+
+        [HttpGet("/folders/check-name-exists")]
+        public string CheckExists([FromQuery] string name, [FromQuery] int parentFolderId)
+        {
+            return folderService.CheckNameExists(name, parentFolderId) ? "true" : "false";
         }
 
         [HttpGet("/folders/name/{id}")]
