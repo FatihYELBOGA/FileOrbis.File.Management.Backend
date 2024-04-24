@@ -9,10 +9,12 @@ namespace FileOrbis.File.Management.Backend.Repositories
     public class AuthRepository : IAuthRepository
     {
         private readonly Database database;
+
         public AuthRepository(Database database)
         {
             this.database = database;
         }
+
         public RefreshToken CheckRefreshToken(RefreshTokenRequest refreshTokenRequest)
         {
             return database.RefreshTokens

@@ -40,18 +40,20 @@ namespace FileOrbis.File.Management.Backend.Controllers
         {
             string folderPath = folderService.GetFolderPath(id);
 
+            bool hasContent = Directory.GetFiles(folderPath).Length > 0 || Directory.GetDirectories(folderPath).Length > 0;
+            if (!hasContent)
+                return StatusCode(204, null);
+
             string zipFileName = folderPath.Split("/")[^1] + ".zip"; 
             try
             {
-                using (MemoryStream memoryStream = new MemoryStream())
+                using MemoryStream memoryStream = new();
+                using (ZipArchive zipArchive = new(memoryStream, ZipArchiveMode.Create, true))
                 {
-                    using (ZipArchive zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                    {
-                        folderService.AddFolderToZip(zipArchive, folderPath, "");
-                    }
-
-                    return File(memoryStream.ToArray(), "application/zip", zipFileName);
+                    folderService.AddFolderToZip(zipArchive, folderPath, "");
                 }
+
+                return File(memoryStream.ToArray(), "application/zip", zipFileName);
             }
             catch (Exception ex)
             {
